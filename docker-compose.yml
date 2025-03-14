@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: ./reflex_app/
+      args:
+        SITE_NAME: ${SITE_NAME}
+        N_ELEMENTS: ${N_ELEMENTS}
+    restart: always
+    networks:
+      - group-register
+    depends_on:
+      - db
+    environment:
+      API_URL: https://${DOMAIN}:8000
+    env_file: .env
+    volumes:
+      - groups_static_site:/app/.web/_static/
+
+  db:
+    build: ./db/
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: always
+    networks:
+      - group-register
+    environment:
+      POSTGRES_DB: groups
+      POSTGRES_USER: groups_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - groups_postgres_data:/var/lib/postgresql/data
+
+  caddy:
+    build: ./caddy/
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    networks:
+      - group-register
+    environment:
+      DOMAIN: ${DOMAIN}
+    depends_on:
+      - app
+    volumes:
+      - groups_static_site:/srv
+      - groups_caddy_data:/data
+      - groups_caddy_config:/config
+
+networks:
+  group-register:
+
+volumes:
+  groups_static_site:
+  groups_postgres_data:
+  groups_caddy_data:
+  groups_caddy_config:
