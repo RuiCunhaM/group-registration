@@ -30,8 +30,8 @@ def github_link() -> rx.Component:
     return rx.button(
         rx.hstack(
             rx.color_mode_cond(
-                rx.text("@ruicunham", color="black", size="3"),
-                rx.text("@ruicunham", color="white", size="3"),
+                rx.text("by @ruicunham", color="black", size="2"),
+                rx.text("by @ruicunham", color="white", size="2"),
             ),
             rx.color_mode_cond(
                 rx.icon("github", color="black", size=30),
@@ -40,7 +40,7 @@ def github_link() -> rx.Component:
             align="center",
             justify="center",
         ),
-        on_click=rx.redirect("https://www.github.com/ruicunham"),
+        on_click=rx.redirect("https://github.com/RuiCunhaM/group-registration"),
         variant="ghost",
         color_scheme="gray",
     )
