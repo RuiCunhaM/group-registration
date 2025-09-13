@@ -14,7 +14,8 @@ from ..layouts.common import common_layout
 
 from ..services.email import send_email
 
-N_ELEMENTS = int(os.getenv("N_ELEMENTS", 3))
+MIN_ELEMENTS = int(os.getenv("MIN_ELEMENTS", 3))
+MAX_ELEMENTS = int(os.getenv("MAX_ELEMENTS", 5))
 SITE_NAME = os.getenv("SITE_NAME", "SITE NAME")
 DOMAIN = os.getenv("DOMAIN", "DOMAIN")
 
@@ -26,15 +27,26 @@ class RegistrationState(rx.State):
     loading = False
     error_dialog = False
     errors: list[str] = []
+    curr_elements = MIN_ELEMENTS
 
-    def open_dialog(self):
+    # NOTE: Weird hacky solution
+    @rx.var
+    def dummy_element_list(self) -> list[int]:
+        return list(range(self.curr_elements))
+
+    def open_error_dialog(self):
         self.error_dialog = True
 
-    def close_dialog(self):
+    def close_error_dialog(self):
         self.error_dialog = False
 
-    def show_error(self):
-        self.open_dialog()
+    @rx.event
+    def add_member(self):
+        self.curr_elements += 1
+
+    @rx.event
+    def remove_member(self):
+        self.curr_elements -= 1
 
     @rx.event(background=True)
     async def handle_submit(self, form_data: dict):
@@ -46,14 +58,14 @@ class RegistrationState(rx.State):
         githubs = set()
         errors = []
 
-        for i in range(N_ELEMENTS):
+        for i in range(self.curr_elements):
             emails.add(form_data[f"email_{i}"])
             githubs.add(form_data[f"github_{i}"])
 
-        if len(emails) != N_ELEMENTS:
+        if len(emails) != self.curr_elements:
             errors.append("No duplicated emails allowed.")
 
-        if len(githubs) != N_ELEMENTS:
+        if len(githubs) != self.curr_elements:
             errors.append("No duplicated GitHub handlers allowed.")
 
         for email in emails:
@@ -78,12 +90,12 @@ class RegistrationState(rx.State):
             async with self:
                 self.errors = errors
                 self.loading = False
-                self.show_error()
+                self.open_error_dialog()
             return
 
         members = []
 
-        for i in range(N_ELEMENTS):
+        for i in range(self.curr_elements):
             members.append(
                 {
                     "email": form_data[f"email_{i}"],
@@ -130,6 +142,26 @@ def email_and_github_form(index) -> rx.Component:
     )
 
 
+def add_element_button() -> rx.Component:
+    return rx.button(
+        rx.text("Add member"),
+        variant="ghost",
+        color_scheme="gray",
+        on_click=RegistrationState.add_member(),
+        type="button",
+    )
+
+
+def remove_element_button() -> rx.Component:
+    return rx.button(
+        rx.text("Remove member"),
+        variant="ghost",
+        color_scheme="gray",
+        on_click=RegistrationState.remove_member(),
+        type="button",
+    )
+
+
 def form() -> rx.Component:
     return rx.vstack(
         rx.heading("Register Group", size="4"),
@@ -144,13 +176,23 @@ def form() -> rx.Component:
                     ),
                     rx.table.body(
                         rx.foreach(
-                            list(range(N_ELEMENTS)),
+                            RegistrationState.dummy_element_list,
                             lambda x: email_and_github_form(x),
                         )
                     ),
                     width="100%",
                     size="1",
                     variant="surface",
+                ),
+                rx.hstack(
+                    rx.cond(
+                        RegistrationState.curr_elements > MIN_ELEMENTS,
+                        remove_element_button(),
+                    ),
+                    rx.cond(
+                        RegistrationState.curr_elements < MAX_ELEMENTS,
+                        add_element_button(),
+                    ),
                 ),
                 rx.cond(
                     RegistrationState.loading,
@@ -192,7 +234,7 @@ def registration() -> rx.Component:
                     rx.text("Errors Found!"),
                     rx.button(
                         "Close",
-                        on_click=RegistrationState.close_dialog,
+                        on_click=RegistrationState.close_error_dialog,  # type: ignore
                         color_scheme="gray",
                     ),
                     direction="column",

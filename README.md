@@ -40,7 +40,8 @@ This plataform aims to provide a tool that streamlines this process.
 
    - `DOMAIN`: The host domain
    - `SITE_NAME`: The platform title. We recommend a short acronym.
-   - `N_ELEMENTS`: The number of elements each group requires.
+   - `MIN_ELEMENTS`: The minimum number of elements each group requires.
+   - `MAX_ELEMENTS`: The maximum number of elements each group can have (Can be equal to `MIN_ELEMENTS`).
    - `DB_PASSWORD`: The DB password.
    - `GMAIL_USERNAME`: A Gmail handler from where to send the automatic emails.
    - `GMAIL_APP_PASSWORD`: The Gmail APP password for `GMAIL_USERNAME`. See [here](https://support.google.com/mail/answer/185833?hl=en) how to get one.
