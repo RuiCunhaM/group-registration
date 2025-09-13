@@ -107,6 +107,46 @@ It will print information to the `stdin`. You should redirect it to a file.
 
 ---
 
+## Developing locally
+
+Steps to run the Reflex app locally:
+
+1. Create a `.env` file
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `DB_PASSWORD` value to `dev_password`
+
+3. Start the database container
+
+   ```bash
+   docker-compose up db -d
+   ```
+
+4. Change directory to `reflex_app`
+
+   ```bash
+   cd reflex_app/
+   ```
+
+5. Create a Python environment and install dependencies
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip3 install -r requirements.txt
+   ```
+
+6. Start Reflex in development mode with live preview
+
+   ```bash
+   reflex run
+   ```
+
+---
+
 ## Privacy Concerns
 
 > [!WARNING]
