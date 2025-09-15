@@ -122,7 +122,7 @@ Steps to run the Reflex app locally:
 3. Start the database container
 
    ```bash
-   docker-compose up db -d
+   docker compose up db -d
    ```
 
 4. Change directory to `reflex_app`
