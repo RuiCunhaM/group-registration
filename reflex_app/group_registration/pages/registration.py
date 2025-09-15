@@ -14,8 +14,8 @@ from ..layouts.common import common_layout
 
 from ..services.email import send_email
 
-MIN_ELEMENTS = int(os.getenv("MIN_ELEMENTS", 3))
-MAX_ELEMENTS = int(os.getenv("MAX_ELEMENTS", 5))
+MIN_MEMBERS = int(os.getenv("MIN_MEMBERS", 3))
+MAX_MEMBERS = int(os.getenv("MAX_MEMBERS", 5))
 SITE_NAME = os.getenv("SITE_NAME", "SITE NAME")
 DOMAIN = os.getenv("DOMAIN", "DOMAIN")
 
@@ -27,12 +27,12 @@ class RegistrationState(rx.State):
     loading = False
     error_dialog = False
     errors: list[str] = []
-    curr_elements = MIN_ELEMENTS
+    curr_members = MIN_MEMBERS
 
     # NOTE: Weird hacky solution
     @rx.var
-    def dummy_element_list(self) -> list[int]:
-        return list(range(self.curr_elements))
+    def dummy_member_list(self) -> list[int]:
+        return list(range(self.curr_members))
 
     def open_error_dialog(self):
         self.error_dialog = True
@@ -42,11 +42,11 @@ class RegistrationState(rx.State):
 
     @rx.event
     def add_member(self):
-        self.curr_elements += 1
+        self.curr_members += 1
 
     @rx.event
     def remove_member(self):
-        self.curr_elements -= 1
+        self.curr_members -= 1
 
     @rx.event(background=True)
     async def handle_submit(self, form_data: dict):
@@ -58,14 +58,14 @@ class RegistrationState(rx.State):
         githubs = set()
         errors = []
 
-        for i in range(self.curr_elements):
+        for i in range(self.curr_members):
             emails.add(form_data[f"email_{i}"])
             githubs.add(form_data[f"github_{i}"])
 
-        if len(emails) != self.curr_elements:
+        if len(emails) != self.curr_members:
             errors.append("No duplicated emails allowed.")
 
-        if len(githubs) != self.curr_elements:
+        if len(githubs) != self.curr_members:
             errors.append("No duplicated GitHub handlers allowed.")
 
         for email in emails:
@@ -95,7 +95,7 @@ class RegistrationState(rx.State):
 
         members = []
 
-        for i in range(self.curr_elements):
+        for i in range(self.curr_members):
             members.append(
                 {
                     "email": form_data[f"email_{i}"],
@@ -142,7 +142,7 @@ def email_and_github_form(index) -> rx.Component:
     )
 
 
-def add_element_button() -> rx.Component:
+def add_member_button() -> rx.Component:
     return rx.button(
         rx.text("Add member"),
         variant="ghost",
@@ -152,7 +152,7 @@ def add_element_button() -> rx.Component:
     )
 
 
-def remove_element_button() -> rx.Component:
+def remove_member_button() -> rx.Component:
     return rx.button(
         rx.text("Remove member"),
         variant="ghost",
@@ -176,7 +176,7 @@ def form() -> rx.Component:
                     ),
                     rx.table.body(
                         rx.foreach(
-                            RegistrationState.dummy_element_list,
+                            RegistrationState.dummy_member_list,
                             lambda x: email_and_github_form(x),
                         )
                     ),
@@ -186,12 +186,12 @@ def form() -> rx.Component:
                 ),
                 rx.hstack(
                     rx.cond(
-                        RegistrationState.curr_elements > MIN_ELEMENTS,
-                        remove_element_button(),
+                        RegistrationState.curr_members > MIN_MEMBERS,
+                        remove_member_button(),
                     ),
                     rx.cond(
-                        RegistrationState.curr_elements < MAX_ELEMENTS,
-                        add_element_button(),
+                        RegistrationState.curr_members < MAX_MEMBERS,
+                        add_member_button(),
                     ),
                 ),
                 rx.cond(

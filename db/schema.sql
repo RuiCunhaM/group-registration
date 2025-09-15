@@ -1,4 +1,4 @@
-CREATE TABLE group_element (
+CREATE TABLE group_member (
     group_id varchar,
     email varchar unique,
     github varchar unique,

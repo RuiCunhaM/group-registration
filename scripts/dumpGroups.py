@@ -22,9 +22,9 @@ def terminate_and_exit():
 def get_confirmed_groups():
     cursor.execute(
         """select group_id, email, github
-        from group_element
+        from group_member
         where group_id in (select group_id
-                          from group_element
+                          from group_member
                           group by group_id
                           having bool_and(invite_status))
         order by group_id;"""
@@ -34,8 +34,8 @@ def get_confirmed_groups():
 
 def print_groups(groups):
     print("Group,Email,GitHub")
-    for element in groups:
-        print(f"{element[0]},{element[1]},{element[2]}")
+    for member in groups:
+        print(f"{member[0]},{member[1]},{member[2]}")
 
 
 if __name__ == "__main__":

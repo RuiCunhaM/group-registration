@@ -4,8 +4,8 @@ services:
       context: ./reflex_app/
       args:
         SITE_NAME: ${SITE_NAME}
-        MIN_ELEMENTS: ${MIN_ELEMENTS}
-        MAX_ELEMENTS: ${MAX_ELEMENTS}
+        MIN_MEMBERS: ${MIN_MEMBERS}
+        MAX_MEMBERS: ${MAX_MEMBERS}
     restart: always
     networks:
       - group-register
