@@ -14,7 +14,7 @@ class ConfirmedGroupsState(rx.State):
         self.groups = get_confirmed_groups()
 
 
-@rx.page(route="/groups", on_load=ConfirmedGroupsState.fetch_groups)
+@rx.page(route="/groups", on_load=ConfirmedGroupsState.fetch_groups)  # type: ignore
 def confirmed_groups() -> rx.Component:
     return common_layout(
         rx.center(

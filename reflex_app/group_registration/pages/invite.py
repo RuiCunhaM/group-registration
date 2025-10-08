@@ -78,7 +78,7 @@ def options() -> rx.Component:
     )
 
 
-@rx.page(route="/invite", on_load=InviteState.fetch_invite)
+@rx.page(route="/invite", on_load=InviteState.fetch_invite)  # type: ignore
 def invite() -> rx.Component:
     return common_layout(
         rx.center(
